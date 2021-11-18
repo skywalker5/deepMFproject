@@ -1,4 +1,5 @@
 import pandas as pd
+import pickle
 
 class DBpediaReader:
     def __init__(self, path='data/text'):
@@ -16,4 +17,15 @@ class DBpediaReader:
 
 class CIFAR100Reader:
     def __init__(self, path='data/image'):
-        pass
+        self.meta_path = f"{path}/meta"
+        self.test_path = f"{path}/test"
+        self.train_path = f"{path}/train"
+
+    def read_data(self):
+        with open(self.meta_path, 'rb') as fo:
+            meta_dict = pickle.load(fo, encoding='bytes')
+        with open(self.train_path, 'rb') as fo:
+            train_dict = pickle.load(fo, encoding='bytes')
+        with open(self.test_path, 'rb') as fo:
+            test_dict = pickle.load(fo, encoding='bytes')
+        return meta_dict, train_dict, test_dict
