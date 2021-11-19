@@ -3,3 +3,4 @@
 data/image
 data/text
 */__pycache__
+.vscode
