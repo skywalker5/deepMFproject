@@ -149,5 +149,5 @@ class CIFAR100Reader:
         self.X_sm = sio.loadmat(self.matrix_path_sm)['X'].T
         self.X_lg = sio.loadmat(self.matrix_path_lg)['X'].T
         M = 255
-        self.X_sm /= M
-        self.X_lg /= M
+        self.X_sm = self.X_sm / M
+        self.X_lg = self.X_lg / M
