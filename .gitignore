@@ -1,6 +1,9 @@
 .DS_Store
 .ipynb_checkpoints
-data/image
 data/text/*.csv
 */__pycache__
 .vscode
+data/image/file.txt~
+data/image/meta
+data/image/test
+data/image/train

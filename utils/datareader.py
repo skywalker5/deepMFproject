@@ -1,8 +1,10 @@
 import pandas as pd
+import numpy as np
 import pickle
 import gensim
 from pathlib import Path
 import utils.doctovec as doctovec
+import scipy.io as sio
 from scipy.sparse import csc_matrix
 from gensim.matutils import corpus2dense, corpus2csc
 
@@ -90,15 +92,62 @@ class DBpediaReader:
 
 class CIFAR100Reader:
     def __init__(self, path='data/image'):
-        self.meta_path = f"{path}/meta"
-        self.test_path = f"{path}/test"
         self.train_path = f"{path}/train"
+        self.data_dict = None
+
+        self.label_path_sm = Path(path) /"cifar100_sm_label.csv"
+        self.label_path_lg = Path(path) /"cifar100_lg_label.csv"
+
+        self.matrix_path_sm = Path(path) /"cifar100_sm_matrix.mat"
+        self.matrix_path_lg = Path(path) /"cifar100_lg_matrix.mat"
 
     def read_data(self):
-        with open(self.meta_path, 'rb') as fo:
-            meta_dict = pickle.load(fo, encoding='bytes')
         with open(self.train_path, 'rb') as fo:
-            train_dict = pickle.load(fo, encoding='bytes')
-        with open(self.test_path, 'rb') as fo:
-            test_dict = pickle.load(fo, encoding='bytes')
-        return meta_dict, train_dict, test_dict
+            self.train_dict = pickle.load(fo, encoding='bytes')
+
+    def sample_data(self, option='sm'):
+        if option == 'sm':
+            n = 1000
+            target_label_path = self.label_path_sm
+            target_matrix_path = self.matrix_path_sm
+        elif option == 'lg':
+            n = 3000
+            target_label_path = self.label_path_lg
+            target_matrix_path = self.matrix_path_lg
+        else:
+            return
+
+        fine_labels = np.array(self.train_dict[b'fine_labels'])
+        coarse_labels = np.array(self.train_dict[b'coarse_labels'])
+        n_each = n//100
+        fine_label_sample = []
+        coarse_label_sample = []
+        data_sample = []
+        np.random.seed(42)
+        for i in range(100):
+            ind = np.where(fine_labels == i)[0]
+            ind_sample = np.random.choice(ind, n_each,replace=False)    
+            fine_label_sample.append(list(fine_labels[ind_sample]))
+            coarse_label_sample.append(list(coarse_labels[ind_sample]))
+            data_sample.append(self.train_dict[b'data'][ind_sample])
+        label_df = pd.DataFrame({'fine_labels':fine_label_sample, 'coarse_label':coarse_label_sample})
+        label_df.to_csv(target_label_path)
+
+        data_mat = np.vstack(data_sample)
+        sio.savemat(target_matrix_path, {'X':data_mat})
+
+    def get_data_matrix(self):
+        if type(self.data_dict) == type(None):
+            self.read_data()
+        if not self.label_path_sm.exists():
+            self.sample_data('sm')
+        if not self.label_path_lg.exists():
+            self.sample_data('lg')
+        
+        self.label_sm = pd.read_csv(self.label_path_sm)
+        self.label_lg = pd.read_csv(self.label_path_lg)
+        self.X_sm = sio.loadmat(self.matrix_path_sm)['X'].T
+        self.X_lg = sio.loadmat(self.matrix_path_lg)['X'].T
+        M = 255
+        self.X_sm /= M
+        self.X_lg /= M
