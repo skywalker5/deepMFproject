@@ -6,7 +6,6 @@ import time
 import numpy as np
 import scipy.sparse as sps
 from scipy.sparse import csr_matrix
-from preprocess import load_data
 
 def hier8_neat(X, k, tol=1e-4, maxiter=10000, trial_allowance=3, unbalanced=0.05):
     t0 = time.time()
@@ -530,37 +529,39 @@ if __name__ == '__main__':
     # tfidf_vectorizer=TfidfVectorizer(stop_words='english',smooth_idf=True,use_idf=True)
     # tfidf_data = tfidf_vectorizer.fit_transform(dataset['paper_text_processed'])
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-i", "--input", required=True, help="Input File")
-    parser.add_argument("-dopreprocess", default=1, help="Do Preprocess",
-                        choices=['0', '1'])
-    if len(sys.argv) == 1:
-        parser.print_help()
-        sys.exit(1)
-    args = parser.parse_args()
-    input_name = args.input
-    preprocess_flag = args.dopreprocess
-    if preprocess_flag=='1':
-        saveFlag=False
-    else:
-        saveFlag=True
+    # parser = argparse.ArgumentParser()
+    # parser.add_argument("-i", "--input", required=True, help="Input File")
+    # parser.add_argument("-dopreprocess", default=1, help="Do Preprocess",
+    #                     choices=['0', '1'])
+    # if len(sys.argv) == 1:
+    #     parser.print_help()
+    #     sys.exit(1)
+    # args = parser.parse_args()
+    # input_name = args.input
+    # preprocess_flag = args.dopreprocess
+    # if preprocess_flag=='1':
+    #     saveFlag=False
+    # else:
+    #     saveFlag=True
 
-    count_data, tfidf_data, dic, ids = load_data(input_name, saved=saveFlag)
+    # count_data, tfidf_data, dic, ids = load_data(input_name, saved=saveFlag)
 
 
-    A = tfidf_data
-    A = csr_matrix(A.T)
-    k = 20
-    #print(np.shape(A))
-    #print(np.shape(dic))
-    parent, children, leaf_label, is_leaf, timings, Ws, Hs, priorities = hier8_neat(A, k)
-    print_deliverable(parent, children, leaf_label, is_leaf, timings, Ws, Hs, priorities,A,dic,ids)
-    leafWs = Ws[:, is_leaf == 1]
-    leaf_topics = np.where(is_leaf == 1)[0]
-    topkeyword = np.argsort(leafWs, axis=0)[::-1][:10]
-    for i in range(0, k):
-        # for j in topkeyword[:, i].tolist():
-        #     print i, j, dic[j][0].tostring()
-        strs = '('+str(len(np.where(leaf_label==leaf_topics[i])[0]))+'): '+', '.join(dic[j] for j in topkeyword[:, i].tolist())
-        print(strs)
+    # A = tfidf_data
+    # A = csr_matrix(A.T)
+    # k = 20
+    # #print(np.shape(A))
+    # #print(np.shape(dic))
+    # parent, children, leaf_label, is_leaf, timings, Ws, Hs, priorities = hier8_neat(A, k)
+    # print_deliverable(parent, children, leaf_label, is_leaf, timings, Ws, Hs, priorities,A,dic,ids)
+    # leafWs = Ws[:, is_leaf == 1]
+    # leaf_topics = np.where(is_leaf == 1)[0]
+    # topkeyword = np.argsort(leafWs, axis=0)[::-1][:10]
+    # for i in range(0, k):
+    #     # for j in topkeyword[:, i].tolist():
+    #     #     print i, j, dic[j][0].tostring()
+    #     strs = '('+str(len(np.where(leaf_label==leaf_topics[i])[0]))+'): '+', '.join(dic[j] for j in topkeyword[:, i].tolist())
+    #     print(strs)
     # print tree, splits, is_leaf, clusters, timings, Ws, priorities
+
+    pass

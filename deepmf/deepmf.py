@@ -1,5 +1,7 @@
 import numpy as np
 from sklearn.decomposition import NMF
+import os, sys
+sys.path.append(os.path.dirname(__file__))
 from nnls import nnlsm_blockpivot
 
 def compute_obj(X, Ws, H):
