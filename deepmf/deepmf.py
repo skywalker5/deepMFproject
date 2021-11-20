@@ -14,6 +14,62 @@ def compute_obj(X, Ws, H):
 
   return fit
 
+def update_AX(X, A, W, options):
+  # W <- min_{W >= 0} || X - A W ||_F^2
+  indep = A.T.dot(X)
+  left  = A.T.dot(A)
+
+  # Lipschitz constant
+  L = np.linalg.norm(left, 2)
+
+  # Accerelartion parameters
+  alphas = []
+  betas  = []
+  alphas.append(0.05)
+
+  # Ensure initialisation is in feasible set
+  W = np.maximum(W, 0)
+  Y = W.copy()
+
+  itr = 1
+  eps0, eps = 0, 1
+  errs = []
+
+  while (itr <= options['inneriters']) and (eps >= options['tol']*eps0):
+    # Previous iterate
+    Wp   = W.copy()
+    grad = left.dot(Y) - indep
+
+    alpha = 0.5 * (np.sqrt(alphas[itr-1]**4 + (4*alphas[itr-1]**2)) - (alphas[itr-1]**2))
+    alphas.append(alpha)    
+
+    beta = alphas[itr-1] * (1-alphas[itr-1]) / ((alphas[itr-1]**2 + alphas[itr]))
+    betas.append(beta)
+
+    # Projected gradient step from Y
+    W = np.maximum(Y - grad / L, 0)
+
+    # Nesterov step (optimal linear combination of iterates)
+    Y = W + betas[itr-1] * (W - Wp)
+
+    fit = 0.5 * np.linalg.norm(X - A.dot(W))**2
+    errs.append(fit)
+
+    if (options['verbose']):
+      print(f'Inner iteration {itr} fit {fit:.4f}')
+
+    # Restart if the error increases
+    if (itr >= 2) and (errs[-1] > errs[-2]):
+      Y = W.copy()
+
+    if (itr == 1):
+      eps0 = np.linalg.norm(W-Wp)
+
+    eps = np.linalg.norm(W-Wp)
+    itr += 1
+
+  return W
+
 def update_AXB(X, A, B, W, options):
   # W <- min_{W >= 0} || X - A W B ||_F^2
   right = B.dot(B.T)
@@ -78,15 +134,23 @@ def update_layers(X, Ws, H, options):
   # Update the first W
   if (options['verbose']):
     print("Updating the W factors")
-    print(f"Updating W[0]")
+
   A = np.eye(Ws[0].shape[1])
   for l in range(1, nlayers):
     A = A.dot(Ws[l])
   A = A.dot(H)
 
-  AAt      = A.dot(A.T)
-  ABt      = A.dot(X.T)
-  Wt, flag = nnlsm_blockpivot(AAt, ABt, is_input_prod=True, init=Ws[0].T)
+  if (options['nnlsm']):
+    if (options['verbose']):
+      print(f"Updating W[0] via BPP")
+    AAt      = A.dot(A.T)
+    ABt      = A.dot(X.T)
+    Wt, flag = nnlsm_blockpivot(AAt, ABt, is_input_prod=True, init=Ws[0].T)
+  else:
+    if (options['verbose']):
+      print(f"Updating W[0] via gradient descent")
+    Wt = update_AX(X.T, A.T, Ws[0].T, options)
+    
   Ws[0]    = Wt.T
 
   # Update the inner Ws
@@ -110,15 +174,20 @@ def update_layers(X, Ws, H, options):
     Ws[l] = update_AXB(X, A, B, Ws[l], options)
 
   # Update H
-  if (options['verbose']):
-    print("Updating H")
   A = np.eye(m)
   for l in range(nlayers):
     A = A.dot(Ws[l])
-  
-  AtA     = A.T.dot(A)
-  AtB     = A.T.dot(X)
-  H, flag = nnlsm_blockpivot(AtA, AtB, is_input_prod=True, init=H)
+ 
+  if (options['nnlsm']): 
+    if (options['verbose']):
+      print("Updating H via BPP")
+    AtA     = A.T.dot(A)
+    AtB     = A.T.dot(X)
+    H, flag = nnlsm_blockpivot(AtA, AtB, is_input_prod=True, init=H)
+  else:
+    if (options['verbose']):
+      print("Updating H via gradient descent")
+    H = update_AX(X, A, H, options)
 
   return Ws, H
 
@@ -137,6 +206,9 @@ def deepmf(X, nlayers, inner_ranks, options):
 
   if (not 'verbose' in options):
     options['verbose'] = False
+
+  if (not 'nnlsm' in options):
+    options['nnlsm'] = False
 
   # Initialise the layers (sequential algo)
   if (options['verbose']):
