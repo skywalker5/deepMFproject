@@ -93,6 +93,7 @@ class DBpediaReader:
 class CIFAR100Reader:
     def __init__(self, path='data/image'):
         self.train_path = f"{path}/train"
+        self.meta_path = f"{path}/meta"
         self.data_dict = None
 
         self.label_path_sm = Path(path) /"cifar100_sm_label.csv"
@@ -104,6 +105,8 @@ class CIFAR100Reader:
     def read_data(self):
         with open(self.train_path, 'rb') as fo:
             self.train_dict = pickle.load(fo, encoding='bytes')
+        with open(self.meta_path, 'rb') as fm:
+            self.meta_dict = pickle.load(fm, encoding='bytes')
 
     def sample_data(self, option='sm'):
         if option == 'sm':
@@ -127,8 +130,8 @@ class CIFAR100Reader:
         for i in range(100):
             ind = np.where(fine_labels == i)[0]
             ind_sample = np.random.choice(ind, n_each,replace=False)    
-            fine_label_sample.append(list(fine_labels[ind_sample]))
-            coarse_label_sample.append(list(coarse_labels[ind_sample]))
+            fine_label_sample.extend(list(fine_labels[ind_sample]))
+            coarse_label_sample.extend(list(coarse_labels[ind_sample]))
             data_sample.append(self.train_dict[b'data'][ind_sample])
         label_df = pd.DataFrame({'fine_labels':fine_label_sample, 'coarse_label':coarse_label_sample})
         label_df.to_csv(target_label_path)

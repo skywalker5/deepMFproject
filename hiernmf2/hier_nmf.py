@@ -382,7 +382,7 @@ def nmfsh_comb_rank2(matrixA, init_matrixW, init_matrixH, tol=1e-4, maxiter=1000
         values_h = gradH[idx_final[0], idx_final[1]]
         norm_h = np.linalg.norm(values_h) ** 2.0
 
-        if iterNumber is 0:
+        if iterNumber == 0:
             init_grad = np.sqrt(norm_w + norm_h)
             continue
         else:
@@ -397,7 +397,7 @@ def nmfsh_comb_rank2(matrixA, init_matrixW, init_matrixH, tol=1e-4, maxiter=1000
     # if norms_W.min() < eps:
     #     sys.exit('Error: Some column of W is essentially zero, please check.')
     # matrixW = matrixW / norms_W
-    if vec_norm is not 0:
+    if vec_norm != 0:
        vec_norm = float(vec_norm)
        norms = (matrixW**vec_norm).sum(axis=0) ** (1/vec_norm)
        matrixW = matrixW / norms
