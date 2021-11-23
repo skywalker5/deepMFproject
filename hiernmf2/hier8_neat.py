@@ -24,7 +24,7 @@ def hier8_neat(X, k, tol=1e-4, maxiter=10000, trial_allowance=3, unbalanced=0.1)
     priorities = np.zeros(2 * (k - 1))
     is_leaf = -1 * np.ones(2 * (k - 1), dtype=np.int64)
     tree = np.zeros((2, 2 * (k - 1)), dtype=np.int64)
-    splits = np.zeros(k - 1, dtype=np.int64)
+    splits = -1 * np.zeros(k - 1, dtype=np.int64)
 
     term_subset = np.where(np.sum(X, axis=1) != 0)[0]
     W = np.random.rand(len(term_subset), 2)
