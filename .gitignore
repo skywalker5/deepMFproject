@@ -1,9 +1,12 @@
 .DS_Store
 .ipynb_checkpoints
-data/text/*.csv
 */__pycache__
 .vscode
 data/image/file.txt~
 data/image/meta
 data/image/test
 data/image/train
+data/text/DBP_wiki_data.csv
+data/text/DBPEDIA_test.csv
+data/text/DBPEDIA_train.csv
+data/text/DBPEDIA_val.csv
