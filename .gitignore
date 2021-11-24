@@ -10,3 +10,4 @@ data/text/DBP_wiki_data.csv
 data/text/DBPEDIA_test.csv
 data/text/DBPEDIA_train.csv
 data/text/DBPEDIA_val.csv
+init.mat
