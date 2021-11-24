@@ -48,8 +48,8 @@ def hier8_neat(X, k, tol=1e-4, maxiter=10000, trial_allowance=3, unbalanced=0.1)
         else:
             leaves = np.where(is_leaf == 1)[0]
             temp_priority = priorities[leaves]
-            print(priorities)
-            print(temp_priority)
+            # print(priorities)
+            # print(temp_priority)
             min_priority = np.min(temp_priority[temp_priority > 0])
             if np.max(temp_priority) < 0:
                 print('Cannot generate all ', k, ' leaf clusters')
@@ -73,10 +73,10 @@ def hier8_neat(X, k, tol=1e-4, maxiter=10000, trial_allowance=3, unbalanced=0.1)
         splits[i] = split_node
         is_leaf[new_nodes] = 1
 
-        print('priorities', priorities[:2 * (i + 1)])
-        print('splits', splits[:i + 1])
-        print('tree', tree[:, :2 * (i + 1)])
-        print('is_leaf', is_leaf[:2 * (i + 1)])
+        # print('priorities', priorities[:2 * (i + 1)])
+        # print('splits', splits[:i + 1])
+        # print('tree', tree[:, :2 * (i + 1)])
+        # print('is_leaf', is_leaf[:2 * (i + 1)])
 
         subset = clusters[new_nodes[0]]
         subset, W_buffer_one, H_buffer_one, priority_one = trial_split(trial_allowance, unbalanced, min_priority, X, subset, W[:, 0], tol, maxiter)

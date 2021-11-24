@@ -13,16 +13,6 @@ def hier8_neat(X, k, tol=1e-4, maxiter=10000, trial_allowance=3, unbalanced=0.05
     m, n = X.shape
 
     # initialize storing variables
-    # timings = np.zeros(k-1)
-    # clusters = np.empty(2 * (k - 1), dtype=object)
-    # Ws = np.zeros((m, 2 * (k - 1)))
-    # W_buffer = np.empty(2 * (k - 1), dtype=object)
-    # H_buffer = np.empty(2 * (k - 1), dtype=object)
-    # priorities = np.zeros(2 * (k - 1))
-    # is_leaf = -1 * np.ones(2 * (k - 1), dtype=np.int64)
-    # tree = np.zeros((2, 2 * (k - 1)), dtype=np.int64)
-    # splits = np.zeros(k - 1, dtype=np.int64)
-
     timings = np.zeros(k - 1)
     parent = np.empty(2 * (k - 1), dtype=np.int64)    # parent id
     #children = np.empty(2*k, dtype=object)    # children ids
