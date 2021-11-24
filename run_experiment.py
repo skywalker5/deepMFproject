@@ -7,13 +7,13 @@ if __name__ == "__main__":
     text_reader = DBpediaReader()
     image_reader = CIFAR100Reader()
 
-    text_reader.get_data_matrix()
+    # text_reader.get_data_matrix()
     image_reader.get_data_matrix()
 
-    text_X_sm = text_reader.X_sm
-    text_X_lg = text_reader.X_lg
+    # text_X_sm = text_reader.X_sm
+    # text_X_lg = text_reader.X_lg
     image_X_sm = image_reader.X_sm
-    image_X_lg = image_reader.X_lg
+    # image_X_lg = image_reader.X_lg
 
     # k=5
     # options = {

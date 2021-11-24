@@ -24,7 +24,7 @@ def hier8_neat(X, k, tol=1e-4, maxiter=10000, trial_allowance=3, unbalanced=0.1)
     priorities = np.zeros(2 * (k - 1))
     is_leaf = -1 * np.ones(2 * (k - 1), dtype=np.int64)
     tree = np.zeros((2, 2 * (k - 1)), dtype=np.int64)
-    splits = np.zeros(k - 1, dtype=np.int64)
+    splits = -1 * np.zeros(k - 1, dtype=np.int64)
 
     term_subset = np.where(np.sum(X, axis=1) != 0)[0]
     W = np.random.rand(len(term_subset), 2)
@@ -334,7 +334,7 @@ def nmfsh_comb_rank2(matrixA, init_matrixW, init_matrixH, tol=1e-4, maxiter=1000
         values_h = gradH[idx_final[0], idx_final[1]]
         norm_h = np.linalg.norm(values_h) ** 2.0
 
-        if iterNumber is 0:
+        if iterNumber == 0:
             init_grad = np.sqrt(norm_w + norm_h)
             continue
         else:
@@ -356,7 +356,7 @@ def nmfsh_comb_rank2(matrixA, init_matrixW, init_matrixH, tol=1e-4, maxiter=1000
 #            matrixH = matrixH/norms[:, np.newaxis]
 #            norms = (matrixH**vec_norm).sum(axis=1) ** (1/vec_norm)
 #     time.time() - t0; print('13', t0 = time.time())
-    print('iterNumber', iterNumber)
+    # print('iterNumber', iterNumber)
     return matrixW, matrixH #, iterNumber+1, grad
 
 #@profile
