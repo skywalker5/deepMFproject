@@ -19,6 +19,7 @@ def hier8_neat(X, k, tol=1e-4, maxiter=10000, trial_allowance=3, unbalanced=0.1)
     timings = np.zeros(k-1)
     clusters = np.empty(2 * (k - 1), dtype=object)
     Ws = np.zeros((m, 2 * (k - 1)))
+    Hs = np.zeros((2 * (k - 1), n))
     W_buffer = np.empty(2 * (k - 1), dtype=object)
     H_buffer = np.empty(2 * (k - 1), dtype=object)
     priorities = np.zeros(2 * (k - 1))
@@ -65,11 +66,13 @@ def hier8_neat(X, k, tol=1e-4, maxiter=10000, trial_allowance=3, unbalanced=0.1)
             tree[1, split_node] = new_nodes[1]
 
         result_used = result_used + 2
-        cluster_subset = np.argmax(H, axis=0)
+        cluster_subset = np.argmax(H[:, split_subset], axis=0)
         clusters[new_nodes[0]] = split_subset[np.where(cluster_subset == 0)[0]]
         clusters[new_nodes[1]] = split_subset[np.where(cluster_subset == 1)[0]]
         Ws[:, new_nodes[0]] = W[:, 0]
         Ws[:, new_nodes[1]] = W[:, 1]
+        Hs[new_nodes[0], :] = H[0, :]
+        Hs[new_nodes[1], :] = H[1, :]
         splits[i] = split_node
         is_leaf[new_nodes] = 1
 
@@ -92,7 +95,7 @@ def hier8_neat(X, k, tol=1e-4, maxiter=10000, trial_allowance=3, unbalanced=0.1)
         H_buffer[new_nodes[1]] = H_buffer_one
         priorities[new_nodes[1]] = priority_one
 
-    return tree, splits, is_leaf, clusters, timings, Ws, priorities
+    return tree, splits, is_leaf, clusters, timings, Ws, Hs, priorities
 
 def trial_split(trial_allowance, unbalanced, min_priority, X, subset, W_parent, tol, maxiter):
     m, n = np.shape(X)
@@ -127,7 +130,8 @@ def trial_split(trial_allowance, unbalanced, min_priority, X, subset, W_parent, 
         print('Recycle ', len(subset_backup)-len(subset), ' documents ...')
         subset = subset_backup
         W_buffer_one = np.zeros((m, 2))
-        H_buffer_one = np.zeros((2, len(subset)))
+        # H_buffer_one = np.zeros((2, len(subset)))
+        H_buffer_one = np.zeros((2, n))
         priority_one = -2
 
     return subset, W_buffer_one, H_buffer_one, priority_one
@@ -139,7 +143,8 @@ def actual_split(X, subset, W_parent, tol, maxiter):
     if subset_length <= 3:
         cluster_subset = np.ones(subset_length)
         W_buffer_one = np.zeros((m, 2))
-        H_buffer_one = np.zeros((2, subset_length))
+        # H_buffer_one = np.zeros((2, subset_length))
+        H_buffer_one = np.zeros((2, n))
         priority_one = -1
     else:
         X_subset = X[:,subset]
@@ -152,7 +157,8 @@ def actual_split(X, subset, W_parent, tol, maxiter):
         cluster_subset = np.argmax(H, axis=0)
         W_buffer_one = np.zeros((m, 2))
         W_buffer_one[term_subset, :] = W
-        H_buffer_one = H
+        H_buffer_one = np.zeros((2, n))
+        H_buffer_one[:, subset] = H
         if len(np.unique(cluster_subset)) > 1:
             priority_one = compute_priority(W_parent, W_buffer_one)
         else:
