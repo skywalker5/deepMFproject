@@ -88,6 +88,20 @@ class DBpediaReader:
         self.X_sm = corpus2dense(self.tfidf_corpus_sm, num_terms, num_docs)
         num_terms, num_docs = len(self.dictionary_lg.keys()), self.dictionary_lg.num_docs
         self.X_lg = corpus2dense(self.tfidf_corpus_lg, num_terms, num_docs)
+
+    def get_sample_data(self, sz="sm"):
+        if (sz == "sm"):
+            data     = pd.read_csv(self.data_path_sm)
+            mmcorp   = gensim.corpora.MmCorpus(str(self.tfidf_path_sm))
+            X        = gensim.matutils.corpus2csc(mmcorp)
+            corpdict = gensim.corpora.Dictionary.load(str(self.dict_path_sm))
+        else: 
+            data     = pd.read_csv(self.data_path_lg)
+            mmcorp   = gensim.corpora.MmCorpus(str(self.tfidf_path_lg))
+            X        = gensim.matutils.corpus2csc(mmcorp)
+            corpdict = gensim.corpora.Dictionary.load(str(self.dict_path_lg))
+
+        return data, X, mmcorp, corpdict
         
 
 class CIFAR100Reader:
