@@ -24,5 +24,5 @@ if __name__ == "__main__":
     # Ws, H, errs = deepmf(text_X_sm, 2, [10,5], options)
     # print("DeepMF done!")
     # parent, children, leaf_label, is_leaf, timings, Ws, Hs, priorities = hier8_neat(text_X_sm, k)
-    tree, splits, is_leaf, clusters, timings, Ws, priorities = hier8_neat(image_X_sm, 5)
+    tree, splits, is_leaf, clusters, timings, Ws, priorities = hier8_neat(image_X_sm, 100)
     print("HierNMF done!")
