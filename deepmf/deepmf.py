@@ -1,3 +1,4 @@
+import psutil
 import numpy as np
 from sklearn.decomposition import NMF
 import os, sys
@@ -212,10 +213,16 @@ def deepmf(X, nlayers, inner_ranks, options):
   if (not 'nnlsm' in options):
     options['nnlsm'] = False
 
+  if (not 'debug' in options):
+    options['debug'] = False
+
   # Initialise the layers (sequential algo)
   if (options['verbose']):
     print('Starting Deep MF')
     print('Initialise all the layers via NMF')
+
+  if (options['debug']):
+    proc  = psutil.Process(os.getpid())
 
   Ws   = []
   errs = []
@@ -224,6 +231,12 @@ def deepmf(X, nlayers, inner_ranks, options):
   for l in range(nlayers):
     if (options['verbose']):
       print(f'Initialising layer {l} with rank {inner_ranks[l]}')
+
+    if (options['debug']):
+      print(f"Memory info.")
+      memvals = proc.memory_info()
+      for k, v in memvals._asdict().items():
+        print(f"{k}: {v / (1024**3):5.4f} GiB")
 
     # Approximate H_l as W_{l+1}H_{l+1}
     model = NMF(inner_ranks[l])
@@ -249,6 +262,12 @@ def deepmf(X, nlayers, inner_ranks, options):
       itr += 1
       if (options["verbose"]):
         print(f"Starting iteration {itr}")
+      
+      if (options['debug']):
+        print(f"Memory info.")
+        memvals = proc.memory_info()
+        for k, v in memvals._asdict().items():
+          print(f"{k}: {v / (1024**3):5.4f} GiB")
 
       # Update the factor matrices
       Ws, H = update_layers(X, Ws, H, options)

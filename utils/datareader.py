@@ -93,12 +93,12 @@ class DBpediaReader:
         if (sz == "sm"):
             data     = pd.read_csv(self.data_path_sm)
             mmcorp   = gensim.corpora.MmCorpus(str(self.tfidf_path_sm))
-            X        = gensim.matutils.corpus2csc(mmcorp)
+            X        = gensim.matutils.corpus2dense(mmcorp, mmcorp.num_terms)
             corpdict = gensim.corpora.Dictionary.load(str(self.dict_path_sm))
         else: 
             data     = pd.read_csv(self.data_path_lg)
             mmcorp   = gensim.corpora.MmCorpus(str(self.tfidf_path_lg))
-            X        = gensim.matutils.corpus2csc(mmcorp)
+            X        = gensim.matutils.corpus2dense(mmcorp, mmcorp.num_terms)
             corpdict = gensim.corpora.Dictionary.load(str(self.dict_path_lg))
 
         return data, X, mmcorp, corpdict
